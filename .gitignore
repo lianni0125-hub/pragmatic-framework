@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.DS_Store
+*.log
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+
+# Large model files — download from HuggingFace Hub (see README)
+plugin/model.safetensors
+
+# MapTask XML data — download from https://groups.inf.ed.ac.uk/maptask/
+maptask/maptaskv2-1/
