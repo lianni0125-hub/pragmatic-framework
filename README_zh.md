@@ -27,6 +27,25 @@ cd pragmatic-framework
 pip install -r requirements.txt
 ```
 
+### 下载模型（运行 Plugin 必须）
+
+模型文件（`model.safetensors`，约 255 MB）过大，无法上传至 GitHub，需单独下载：
+
+```bash
+# 方式一：通过 HuggingFace Hub 下载（推荐）
+python -c "from huggingface_hub import hf_hub_download; hf_hub_download(repo_id='lianni0125/pragmatic-plugin', filename='model.safetensors', local_dir='plugin')"
+
+# 方式二：手动下载
+# 访问 https://huggingface.co/lianni0125/pragmatic-plugin，手动下载 model.safetensors 并放入 plugin/ 目录
+```
+
+### 下载 MapTask 语料（可选，用于跨语料库评估）
+
+```bash
+# 访问 https://groups.inf.ed.ac.uk/maptask/
+# 下载 maptaskv2-1.tar.gz 并解压到 maptask/maptaskv2-1/ 目录
+```
+
 ### 提取语用向量
 
 ```python
@@ -62,7 +81,7 @@ python scripts/cross_corpus_maptask.py
 ```
 pragmatic-framework/
 ├── plugin/                          # 🎯 预训练 DA Plugin
-│   ├── model.safetensors            # 模型权重
+│   ├── model.safetensors            # ⚠️ 从 HuggingFace 下载: https://huggingface.co/lianni0125/pragmatic-plugin
 │   ├── tokenizer.json               # 分词器
 │   ├── vocab.txt                    # 词表
 │   ├── label_map.json               # SwDA 标签映射

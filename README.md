@@ -27,6 +27,25 @@ cd pragmatic-framework
 pip install -r requirements.txt
 ```
 
+### Download Model (required for running the Plugin)
+
+The model file (`model.safetensors`, ~255 MB) is too large for GitHub and must be downloaded separately:
+
+```bash
+# Option 1: Download from HuggingFace Hub (recommended)
+python -c "from huggingface_hub import hf_hub_download; hf_hub_download(repo_id='lianni0125/pragmatic-plugin', filename='model.safetensors', local_dir='plugin')"
+
+# Option 2: Download manually
+# Visit https://huggingface.co/lianni0125/pragmatic-plugin, download model.safetensors, and place it in the plugin/ directory
+```
+
+### Download MapTask Corpus (optional, for cross-corpus evaluation)
+
+```bash
+# Visit https://groups.inf.ed.ac.uk/maptask/
+# Download maptaskv2-1.tar.gz and unzip to maptask/maptaskv2-1/
+```
+
 ### Extract Pragmatic Vectors
 
 ```python
@@ -62,7 +81,7 @@ python scripts/cross_corpus_maptask.py
 ```
 pragmatic-framework/
 ├── plugin/                          # 🎯 Pre-trained DA Plugin
-│   ├── model.safetensors            # Model weights
+│   ├── model.safetensors            # ⚠️ Download from HuggingFace: https://huggingface.co/lianni0125/pragmatic-plugin
 │   ├── tokenizer.json               # Tokenizer
 │   ├── vocab.txt                    # Vocabulary
 │   ├── label_map.json               # SwDA label mapping
