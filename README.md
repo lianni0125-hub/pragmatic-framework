@@ -1,12 +1,24 @@
 # Pragmatic Framework
 
-> A geometric framework for analyzing conversational language through dialogue-act supervision
+> :brain: Map conversational language into a **geometric space** through dialogue-act supervision
 
 ![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
 ![Framework](https://img.shields.io/badge/Framework-DistilBERT-red.svg)
 
-Maps utterances to 768-dimensional pragmatic vectors and provides tools for corpus-level distribution analysis, speaker-level profiling, sequential dynamics, and cross-corpus generalization.
+Turn raw utterances into **768-dimensional pragmatic vectors** where dialogue acts become spatial structure. The framework gives you a trained DistilBERT DA tagger (293-class DAMSL) plus a full analysis toolkit.
+
+### :star: What You Get
+
+| Feature | Description |
+|---------|-------------|
+| :brain: **DA Plugin** | Pre-trained DistilBERT tagger — predict 293 DAMSL dialogue acts on any English dialogue |
+| :chart_with_upwards_trend: **Pragmatic Vectors** | 768-dim vectors capturing communicative function, not just semantics |
+| :microscope: **Geometric Analysis** | PCA centroids, cosine similarity, interpolation paths between dialogue acts |
+| :busts_in_silhouette: **Speaker Profiling** | Role-based profiling (Guide vs Follower) with real named speakers |
+| :arrows_counterclockwise: **Cross-Corpus Generalization** | Trained on SwDA → evaluated on MapTask (8 functional categories) |
+
+> **"You should go." vs "Should you go?"** — Same words, different dialogue acts → **different pragmatic vectors** in the learned space.
 
 ---
 

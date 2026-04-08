@@ -1,12 +1,24 @@
 # Pragmatic Framework
 
-> 对话语言的语用框架：通过对话行为监督实现几何表征与分析
+> :brain: 将对话语言通过对话行为监督映射为**几何空间**
 
 ![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
 ![Framework](https://img.shields.io/badge/Framework-DistilBERT-red.svg)
 
-将对话语料映射为 768 维语用向量，提供语料级分布分析、说话人画像、序列动态和跨语料泛化工具。
+将原始对话文本转化为 **768 维语用向量**，对话行为变成空间中的结构。框架提供预训练的 DistilBERT DA 标注器（293 类 DAMSL）以及完整的分析工具链。
+
+### :star: 核心亮点
+
+| 功能 | 说明 |
+|------|------|
+| :brain: **DA Plugin** | 预训练 DistilBERT 标注器 — 可对任意英语对话预测 293 类 DAMSL 对话行为 |
+| :chart_with_upwards_trend: **语用向量** | 768 维向量，捕捉交流功能而非仅语义内容 |
+| :microscope: **几何分析** | PCA 中心点、余弦相似度、对话行为间的插值路径 |
+| :busts_in_silhouette: **说话人画像** | 基于角色的画像（Guide vs Follower），含真实姓名 |
+| :arrows_counterclockwise: **跨语料泛化** | 在 SwDA 上训练 → 在 MapTask 上评测（8 个功能类别） |
+
+> **"You should go." vs "Should you go?"** — 词相同、对话行为不同 → 在学习到的空间中**向量不同**。
 
 ---
 
