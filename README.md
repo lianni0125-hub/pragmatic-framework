@@ -96,7 +96,7 @@ The framework revolves around three numbers:
 | **293** | Number of fine-grained SwDA DAMSL tags the plugin can predict | Plugin classification head (768 → 293) |
 | **8** | Coarse-grained DA categories for analysis convenience (293 → 8 mapping) | Used in downstream analysis scripts |
 
-> **Why 768?** The plugin is built on DistilBERT, whose encoder outputs 768-dim hidden states. These vectors encode communicative function — two utterances with the same words but different dialogue acts (e.g., "You should go." vs "Should you go?") will have **different** 768-dim pragmatic vectors even though their semantic content is similar.
+> **Why 768?** The plugin is built on DistilBERT, whose encoder outputs 768-dim hidden states. These vectors encode communicative function — two utterances with the same words but different dialogue acts (e.g., "That's interesting." vs "That's interesting?") will have **different** 768-dim pragmatic vectors even though their semantic content is similar.
 
 ---
 
