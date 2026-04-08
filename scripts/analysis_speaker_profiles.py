@@ -1,4 +1,6 @@
-import json, numpy as np, re
+#!/usr/bin/env python3
+"""Analyze speaker profiles from MapTask conversation episodes."""
+import json, numpy as np, re, os
 from collections import Counter, defaultdict
 import matplotlib
 matplotlib.use("Agg")
@@ -6,6 +8,13 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.manifold import TSNE
 import torch
+
+EPISODES_FILE = os.path.join(os.path.dirname(__file__), "..", "maptask", "episodes_T6.jsonl")
+if not os.path.exists(EPISODES_FILE):
+    raise FileNotFoundError(
+        f"Episodes file not found: {EPISODES_FILE}\n"
+        "Run: bash scripts/download_maptask.sh"
+    )
 
 # ========================
 # Speaker info from episodes_T6
@@ -15,7 +24,7 @@ print("=== Loading speaker-utterance data ===")
 episode_speaker_turns = {}  # conv_id -> {turn_id -> speaker}
 conv_ids_in_episodes = set()
 
-with open("../maptask/episodes_T6.jsonl") as f:  # TODO: set to your episodes_T6.jsonl path
+with open(EPISODES_FILE) as f:
     for line in f:
         ep = json.loads(line)
         cid = ep["conv_id"]
@@ -51,7 +60,7 @@ test_utterances = []
 conv_turn_text = defaultdict(dict)
 
 for split in ["test"]:
-    path = f"../data/{split}.jsonl"  # TODO: set to your data directory
+    path = f"../data/{split}.jsonl"
     with open(path) as f:
         for line in f:
             d = json.loads(line)
@@ -113,7 +122,7 @@ ax2.set_xlabel('Count')
 ax2.set_title('E2: Speaker A Top-10 DAs')
 
 plt.tight_layout()
-plt.savefig("E2_speaker_distribution.png", dpi=150)
+plt.savefig("../figures/E2_speaker_distribution.png", dpi=150)
 print("Saved: E2_speaker_distribution.png")
 
 # ========================
@@ -121,7 +130,14 @@ print("Saved: E2_speaker_distribution.png")
 # ========================
 print("\n=== E5: Speaker UMAP ===")
 # Load prag_vectors.pt (100 x 768)
-vectors = torch.load("../vectors/prag_vectors.pt", map_location="cpu").numpy()  # TODO: set to your prag_vectors.pt path
+VECTORS_FILE = os.path.join(os.path.dirname(__file__), "..", "vectors", "prag_vectors.pt")
+if not os.path.exists(VECTORS_FILE):
+    raise FileNotFoundError(
+        f"prag_vectors.pt not found: {VECTORS_FILE}\n"
+        "This file is included in the repository but may need to be downloaded.\n"
+        "If missing, run: python scripts/make_contexts_from_swda.py && python scripts/precompute_prag_vectors.py"
+    )
+vectors = torch.load(VECTORS_FILE, map_location="cpu").numpy()
 print(f"prag_vectors shape: {vectors.shape}")
 
 # We have 100 vectors but need speaker labels
@@ -132,7 +148,7 @@ print(f"prag_vectors shape: {vectors.shape}")
 
 # Load first 100 episodes and their speakers
 speaker_labels = []
-with open("../maptask/episodes_T6.jsonl") as f:  # TODO: set to your episodes_T6.jsonl path
+with open(EPISODES_FILE) as f:
     for idx, line in enumerate(f):
         if idx >= 100:
             break
@@ -163,7 +179,7 @@ ax.set_title("E5: Pragmatic Representation Space Colored by Speaker (t-SNE)")
 ax.legend(handles=[plt.Line2D([0],[0], marker='o', color='w', markerfacecolor='cornflowerblue', label='Speaker A', markersize=8),
                    plt.Line2D([0],[0], marker='o', color='w', markerfacecolor='coral', label='Speaker B', markersize=8)])
 plt.tight_layout()
-plt.savefig("E5_speaker_umap.png", dpi=150)
+plt.savefig("../figures/E5_speaker_umap.png", dpi=150)
 print("Saved: E5_speaker_umap.png")
 
 print("\nE2 and E5 complete!")

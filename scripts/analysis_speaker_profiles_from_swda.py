@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+"""Analyze speaker profiles from SwDA zip transcripts."""
 import json, numpy as np, zipfile, csv, io
 from collections import Counter, defaultdict
 import matplotlib
@@ -7,6 +9,15 @@ import seaborn as sns
 from sklearn.manifold import TSNE
 import torch
 
+SWDA_ZIP = os.path.join(os.path.dirname(__file__), "..", "swda.zip")
+if not os.path.exists(SWDA_ZIP):
+    raise FileNotFoundError(
+        f"SwDA zip file not found: {SWDA_ZIP}\n"
+        "Please download the Switchboard-I transcripts from:\n"
+        "  https://www.switchboard.co.uk/#data\n"
+        "Place the downloaded swda.zip in the project root directory."
+    )
+
 print("=== Extracting speaker info from swda.zip ===")
 # Build conv_id -> {utterance_index -> caller} mapping
 # Only for conversations that appear in our data
@@ -15,7 +26,7 @@ target_convs = set()
 
 # First, collect all conv_ids from splits_final2
 for split in ["train", "valid", "test"]:
-    path = f"../data/{split}.jsonl"  # TODO: set to your data directory
+    path = f"../data/{split}.jsonl"
     with open(path) as f:
         for line in f:
             d = json.loads(line)
@@ -23,7 +34,7 @@ for split in ["train", "valid", "test"]:
 
 print(f"Target conversations: {len(target_convs)}")
 
-z = zipfile.ZipFile("../swda.zip")  # TODO: set to your swda.zip path
+z = zipfile.ZipFile(SWDA_ZIP)
 utt_files = [n for n in z.namelist() if n.endswith('.utt.csv') and '__MACOSX' not in n]
 print(f"Total .utt.csv files in zip: {len(utt_files)}")
 
@@ -83,7 +94,7 @@ matched_utts = 0
 unmatched_convs = []
 
 for split in ["train", "valid", "test"]:
-    path = f"../data/{split}.jsonl"  # TODO: set to your data directory
+    path = f"../data/{split}.jsonl"
     with open(path) as f:
         for line in f:
             d = json.loads(line)
@@ -143,7 +154,7 @@ ax2.set_title('E2: Top-10 DAs by Speaker')
 ax2.legend()
 
 plt.tight_layout()
-plt.savefig("E2_speaker_distribution.png", dpi=150)
+plt.savefig("../figures/E2_speaker_distribution.png", dpi=150)
 print("Saved: E2_speaker_distribution.png")
 
 print("\nSpeaker A top5:", speaker_da_counter["A"].most_common(5))
@@ -153,7 +164,14 @@ print("Speaker B top5:", speaker_da_counter["B"].most_common(5))
 # E5: Speaker UMAP - aggregate to speaker level
 # ========================
 print("\n=== E5: Speaker-level UMAP ===")
-vectors = torch.load("../vectors/prag_vectors.pt", map_location="cpu").numpy()  # TODO: set to your prag_vectors.pt path
+VECTORS_FILE = os.path.join(os.path.dirname(__file__), "..", "vectors", "prag_vectors.pt")
+if not os.path.exists(VECTORS_FILE):
+    raise FileNotFoundError(
+        f"prag_vectors.pt not found: {VECTORS_FILE}\n"
+        "This file is included in the repository but may need to be downloaded.\n"
+        "If missing, run: python scripts/make_contexts_from_swda.py && python scripts/precompute_prag_vectors.py"
+    )
+vectors = torch.load(VECTORS_FILE, map_location="cpu").numpy()
 print(f"prag_vectors shape: {vectors.shape}")
 
 # Aggregate per-utterance pragmatic vectors by speaker
@@ -181,7 +199,7 @@ ax.legend()
 ax.set_xlabel('PC1')
 ax.set_ylabel('PC2')
 plt.tight_layout()
-plt.savefig("E5_speaker_umap.png", dpi=150)
+plt.savefig("../figures/E5_speaker_umap.png", dpi=150)
 print("Saved: E5_speaker_umap.png")
 
 print("\nAll analysis complete!")

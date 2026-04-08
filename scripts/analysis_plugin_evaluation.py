@@ -1,13 +1,9 @@
+#!/usr/bin/env python3
 """
-E7d-Full: Full Plugin Evaluation on SwDA 5000-sample + Cross-corpus Discussion
-Runs the Plugin on the full SwDA test set and produces:
-1. E7d1: Gold vs Plugin distribution
-2. E7d2: Confusion matrix at coarse DA level (SwDA 43 -> 7 coarse categories)
-3. E7d3: Per-DA accuracy bar chart
-4. Cross-corpus transfer analysis summary
+Full Plugin Evaluation on SwDA test set.
+Produces gold vs plugin DA distribution, confusion matrix at coarse level, and per-DA accuracy.
 """
 import os
-os.environ["HF_ENDPOINT"] = "https://hf-mirror.com"
 import json
 import torch
 import torch.nn as nn
@@ -21,10 +17,21 @@ import matplotlib.pyplot as plt
 import warnings
 warnings.filterwarnings('ignore')
 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+ROOT_DIR = os.path.dirname(SCRIPT_DIR)
+PLUGIN_DIR = os.path.join(ROOT_DIR, "plugin")
+MODEL_FILE = os.path.join(PLUGIN_DIR, "model.safetensors")
+
+if not os.path.exists(MODEL_FILE):
+    raise FileNotFoundError(
+        f"Plugin model not found: {MODEL_FILE}\n"
+        "Run: python -c \"from huggingface_hub import snapshot_download; "
+        "snapshot_download('Anni0125/pragmatic-framework', local_dir='plugin')\""
+    )
+
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"Using device: {DEVICE}")
 
-PLUGIN_DIR = "../plugin"  # TODO: set to your plugin directory
 BASE = "distilbert-base-uncased"
 MAX_LEN = 64
 BATCH = 256
@@ -70,7 +77,7 @@ def predict_da(texts):
 print("\n=== Loading SwDA test data ===")
 sw_texts = []
 sw_true_das = []
-with open("../data/test.jsonl") as f:  # TODO: set to your data directory
+with open("../data/test.jsonl") as f:
     for i, line in enumerate(f):
         if i >= N_SAMPLE:
             break
@@ -153,7 +160,7 @@ ax2.set_xticklabels(das2, rotation=30, ha="right")
 ax2.set_ylabel("Count")
 ax2.set_title("E7d: Plugin Predictions (SwDA, Top-12)")
 plt.tight_layout()
-plt.savefig("E7d1_da_comparison.png", dpi=150)
+plt.savefig("../figures/E7d1_da_comparison.png", dpi=150)
 print("Saved: E7d1_da_comparison.png")
 
 # ========================
@@ -189,7 +196,7 @@ for i in range(n):
                    color="white" if val > 0.5 else "black", fontsize=10)
 plt.colorbar(im, ax=ax, label="Proportion")
 plt.tight_layout()
-plt.savefig("E7d2_confusion_coarse.png", dpi=150)
+plt.savefig("../figures/E7d2_confusion_coarse.png", dpi=150)
 print("Saved: E7d2_confusion_coarse.png")
 
 print("\nCoarse-level per-category accuracy:")
@@ -226,7 +233,7 @@ ax.legend()
 for i, (d, a) in enumerate(zip(top_das_acc, accs)):
     ax.text(i, a + 0.02, f"{a:.2f}", ha="center", fontsize=8)
 plt.tight_layout()
-plt.savefig("E7d3_per_da_acc.png", dpi=150)
+plt.savefig("../figures/E7d3_per_da_acc.png", dpi=150)
 print("Saved: E7d3_per_da_acc.png")
 
 # ========================

@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+"""Analyze DA distribution and transition patterns in the SwDA dataset."""
 import json, numpy as np
 from collections import Counter, defaultdict
 import matplotlib
@@ -9,7 +11,7 @@ import seaborn as sns
 print("=== E1: Global DA Distribution ===")
 da_counter = Counter()
 for split in ["train", "valid", "test"]:
-    path = f"../data/{split}.jsonl"  # TODO: set to your data directory
+    path = f"../data/{split}.jsonl"
     with open(path) as f:
         for line in f:
             d = json.loads(line)
@@ -32,7 +34,7 @@ ax.set_title("E1: Top-20 Dialogue Act Distribution (Switchboard)")
 for i, (da, cnt) in enumerate(top20):
     ax.text(i, cnt + total*0.01, f"{100*cnt/total:.1f}%", ha="center", fontsize=7)
 plt.tight_layout()
-plt.savefig("E1_da_distribution.png", dpi=150)
+plt.savefig("../figures/E1_da_distribution.png", dpi=150)
 print("Saved: E1_da_distribution.png")
 
 # E3: Transition matrix
@@ -41,7 +43,7 @@ print("=== E3: Pragmatic Transition Matrix ===")
 transitions = defaultdict(Counter)
 conv_seq = defaultdict(list)
 for split in ["train", "valid", "test"]:
-    path = f"../data/{split}.jsonl"  # TODO: set to your data directory
+    path = f"../data/{split}.jsonl"
     with open(path) as f:
         for line in f:
             d = json.loads(line)
@@ -70,7 +72,7 @@ ax.set_xlabel("To DA")
 ax.set_ylabel("From DA")
 ax.set_title("E3: DA Transition Probability Matrix (Top-15 DAs)")
 plt.tight_layout()
-plt.savefig("E3_transition_matrix.png", dpi=150)
+plt.savefig("../figures/E3_transition_matrix.png", dpi=150)
 print("Saved: E3_transition_matrix.png")
 
 all_t = []

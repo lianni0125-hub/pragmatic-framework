@@ -1,5 +1,6 @@
+#!/usr/bin/env python3
+"""Analyze the geometric structure of pragmatic vector space."""
 import os
-os.environ["HF_ENDPOINT"] = "https://hf-mirror.com"
 import json
 import torch
 import torch.nn as nn
@@ -11,10 +12,21 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+ROOT_DIR = os.path.dirname(SCRIPT_DIR)
+PLUGIN_DIR = os.path.join(ROOT_DIR, "plugin")
+MODEL_FILE = os.path.join(PLUGIN_DIR, "model.safetensors")
+
+if not os.path.exists(MODEL_FILE):
+    raise FileNotFoundError(
+        f"Plugin model not found: {MODEL_FILE}\n"
+        "Run: python -c \"from huggingface_hub import snapshot_download; "
+        "snapshot_download('Anni0125/pragmatic-framework', local_dir='plugin')\""
+    )
+
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"Using device: {DEVICE}")
 
-PLUGIN_DIR = "../plugin"  # TODO: set to your plugin directory
 BASE = "distilbert-base-uncased"
 MAX_LEN = 64
 BATCH = 128
@@ -67,7 +79,7 @@ def predict_da_vectors(texts):
 print("\n=== Loading Switchboard test data ===")
 texts = []
 conv_ids = []
-with open("../data/test.jsonl") as f:  # TODO: set to your data directory
+with open("../data/test.jsonl") as f:
     for i, line in enumerate(f):
         if i >= N_SAMPLE:
             break
@@ -106,7 +118,7 @@ ax.set_title("E7a: DA Distribution (Plugin Predictions on Switchboard Test Set)"
 for i, (da, cnt) in enumerate(top20):
     ax.text(i, cnt + total*0.005, f"{100*cnt/total:.1f}%", ha="center", fontsize=7)
 plt.tight_layout()
-plt.savefig("E7a_da_distribution.png", dpi=150)
+plt.savefig("../figures/E7a_da_distribution.png", dpi=150)
 print("Saved: E7a_da_distribution.png")
 
 # ========================
@@ -149,7 +161,7 @@ ax.set_xlabel(f"PC1 ({explained[0]:.1%} var)")
 ax.set_ylabel(f"PC2 ({explained[1]:.1%} var)")
 ax.set_title("E7b: DA Types in Pragmatic Representation Space\n(Mean Vectors, PCA projected)")
 plt.tight_layout()
-plt.savefig("E7b_da_space.png", dpi=150)
+plt.savefig("../figures/E7b_da_space.png", dpi=150)
 print("Saved: E7b_da_space.png")
 
 # ========================
@@ -244,7 +256,7 @@ ax2.set_xticklabels(top_das_control[:8], rotation=30, ha="right")
 ax2.set_ylabel("Max Cosine Similarity")
 ax2.set_title(f"E7c: Controlled Retrieval Example\n(True DA: {da_preds[example_idx]})")
 plt.tight_layout()
-plt.savefig("E7c_control.png", dpi=150)
+plt.savefig("../figures/E7c_control.png", dpi=150)
 print("Saved: E7c_control.png")
 
 print("\nE7 complete!")

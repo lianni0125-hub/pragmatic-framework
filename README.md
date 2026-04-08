@@ -1,52 +1,94 @@
-# 🎯 Pragmatic Framework
+# Pragmatic Framework
 
-> A geometric framework for analyzing conversational language through dialogue-act supervision ✨
+> A geometric framework for analyzing conversational language through dialogue-act supervision
 
-[![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
+![License](https://img.shields.io/badge/License-MIT-green.svg)
+![Framework](https://img.shields.io/badge/Framework-DistilBERT-red.svg)
 
-## 📖 Overview
+Maps utterances to 768-dimensional pragmatic vectors and provides tools for corpus-level distribution analysis, speaker-level profiling, sequential dynamics, and cross-corpus generalization.
 
-This repository provides a **DistilBERT-based Dialogue Act (DA) tagger (Plugin)** trained on the **Switchboard Dialog Act Corpus (SwDA)**, along with a set of **768-dimensional pragmatic vectors** derived from the Plugin's output. These resources enable geometric analysis of pragmatic functions in conversational language.
+---
 
-## 🎯 Resources at a Glance
-
-| Resource | Description | Size |
-|----------|-------------|------|
-| 📦 `plugin/` | Pre-trained DA Plugin model | ~255 MB |
-| 🧮 `vectors/` | Pre-computed 768-dim pragmatic vectors | ~300 KB |
-| 📊 `data/` | Annotated dataset splits (train/valid/test) | ~5.9 MB |
-| 🐍 `scripts/` | Reproducible analysis scripts | — |
-
-## 🚀 Quick Start
-
-### Installation
+## :wrench: Setup
 
 ```bash
+# 1. Clone the repo
 git clone https://github.com/lianni0125-hub/pragmatic-framework.git
 cd pragmatic-framework
+
+# 2. Install dependencies
 pip install -r requirements.txt
+
+# 3. Download the DA Plugin model from HuggingFace Hub
+python -c "from huggingface_hub import snapshot_download; snapshot_download('Anni0125/pragmatic-framework', local_dir='plugin')"
+
+# 4. Download MapTask data (required for some scripts)
+bash scripts/download_maptask.sh
 ```
 
-### Download Model (required for running the Plugin)
+> :bulb: **Chinese user?** If HuggingFace is slow, set a mirror first:
+> ```bash
+> export HF_ENDPOINT=https://hf-mirror.com    # Linux/macOS
+> set HF_ENDPOINT=https://hf-mirror.com       # Windows
+> ```
 
-The model file (`model.safetensors`, ~255 MB) is too large for GitHub and must be downloaded separately:
+---
+
+## :rocket: Quick Start
 
 ```bash
-# Option 1: Download from HuggingFace Hub (recommended)
-python -c "from huggingface_hub import hf_hub_download; hf_hub_download(repo_id='lianni0125/pragmatic-plugin', filename='model.safetensors', local_dir='plugin')"
+# DA distribution & transition analysis
+python scripts/analysis_da_distribution.py
 
-# Option 2: Download manually
-# Visit https://huggingface.co/lianni0125/pragmatic-plugin, download model.safetensors, and place it in the plugin/ directory
+# Plugin accuracy on SwDA
+python scripts/analysis_plugin_evaluation.py
+
+# Speaker profiling (requires MapTask data)
+python scripts/analysis_speaker_profiles.py
+
+# Cross-corpus evaluation (SwDA → MapTask, requires MapTask data)
+python scripts/analysis_cross_corpus.py
+
+# MapTask speaker/topic analysis (requires MapTask data)
+python scripts/analysis_maptask_profiles.py
+
+# Geometric space analysis
+python scripts/analysis_pragmatic_space.py
+
+# Extract pragmatic vectors from your own data
+python scripts/extract_vectors.py --input your_data.jsonl --output your_vectors.pt
 ```
 
-### Download MapTask Corpus (optional, for cross-corpus evaluation)
+---
 
-```bash
-# Visit https://groups.inf.ed.ac.uk/maptask/
-# Download maptaskv2-1.tar.gz and unzip to maptask/maptaskv2-1/
-```
+## :package: What's Inside
 
-### Extract Pragmatic Vectors
+| Directory | Description |
+|-----------|-------------|
+| `plugin/` :brain: | Pre-trained DistilBERT DA tagger (293-class DAMSL scheme) |
+| `vectors/` :chart_with_upwards_trend: | Pre-computed 768-dim pragmatic vectors |
+| `data/` :file_folder: | Pre-processed SwDA train/valid/test splits (JSONL) |
+| `scripts/` :scroll: | 14 analysis & utility scripts |
+| `figures/` :art: | Output figures (auto-created on first run) |
+
+---
+
+## :bulb: Key Numbers
+
+The framework revolves around three numbers:
+
+| Number | Meaning | Where It's Used |
+|--------|---------|----------------|
+| **768** | DistilBERT hidden dimension — the vector size for all pragmatic representations | `vectors/prag_vectors.pt`, plugin output |
+| **293** | Number of fine-grained SwDA DAMSL tags the plugin can predict | Plugin classification head (768 → 293) |
+| **8** | Coarse-grained DA categories for analysis convenience (293 → 8 mapping) | Used in downstream analysis scripts |
+
+> **Why 768?** The plugin is built on DistilBERT, whose encoder outputs 768-dim hidden states. These vectors encode communicative function — two utterances with the same words but different dialogue acts (e.g., "You should go." vs "Should you go?") will have **different** 768-dim pragmatic vectors even though their semantic content is similar.
+
+---
+
+## :gear: Plugin Usage
 
 ```python
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
@@ -60,86 +102,52 @@ text = "Yeah I think that would be great"
 inputs = tokenizer(text, return_tensors="pt", truncation=True, max_length=64)
 with torch.no_grad():
     outputs = model(**inputs)
-    vector = outputs.logits  # 🎯 768-dim pragmatic vector
+    vector = outputs.logits  # torch.Size([1, 768])
 ```
 
-### Reproduce Paper Analyses
+---
 
-```bash
-# PCA visualization & interpolation analysis
-python scripts/pca_interpolation.py --vectors vectors/prag_vectors.pt
+## :arrow_down: External Data
 
-# Corpus-level distribution analysis
-python scripts/da_distribution.py
+Some scripts require additional data:
 
-# Cross-corpus evaluation (SwDA → MapTask)
-python scripts/cross_corpus_maptask.py
-```
+| Data | How to Get | Used By |
+|------|-----------|---------|
+| **MapTask v2.1** | `bash scripts/download_maptask.sh` (auto-downloads) | `analysis_cross_corpus.py`, `analysis_maptask_profiles.py`, `analysis_speaker_profiles.py` |
+| **SwDA transcripts** | Download from [switchboard.co.uk](https://www.switchboard.co.uk/#data), place as `swda.zip` | `analysis_speaker_profiles_from_swda.py` |
 
-## 📁 Project Structure
+---
 
-```
-pragmatic-framework/
-├── plugin/                          # 🎯 Pre-trained DA Plugin
-│   ├── model.safetensors            # ⚠️ Download from HuggingFace: https://huggingface.co/lianni0125/pragmatic-plugin
-│   ├── tokenizer.json               # Tokenizer
-│   ├── vocab.txt                    # Vocabulary
-│   ├── label_map.json               # SwDA label mapping
-│   ├── special_tokens_map.json      # Special tokens mapping
-│   ├── tokenizer_config.json        # Tokenizer configuration
-│   └── training_args.bin            # Training arguments
-├── vectors/                         # 🧮 Pragmatic vectors
-│   └── prag_vectors.pt              # All utterances → 768-d vectors
-├── data/                            # 📊 Dataset splits (SwDA)
-│   ├── train.jsonl                  # Training set
-│   ├── valid.jsonl                  # Validation set
-│   └── test.jsonl                   # Test set
-├── maptask/                          # 🗂️ HCRC MapTask corpus (for cross-corpus eval)
-│   ├── maptaskv2-1/                 # ⚠️ Download from: https://groups.inf.ed.ac.uk/maptask/ and place here
-│   ├── maptask_text_da.json         # Extracted MapTask utterances with DA labels
-│   └── episodes_T6.jsonl             # Dialog episodes (6 turns each)
-├── swda.zip                          # Full SwDA transcript zip (for speaker profiling)
-├── scripts/                         # 🐍 Analysis scripts
-│   ├── coarse_label_mapping.py     # Map SwDA 43-class to 7 coarse categories
-│   ├── cross_corpus_maptask.py     # Evaluate Plugin on MapTask corpus
-│   ├── da_distribution.py           # DA distribution + transition matrix
-│   ├── extract_maptask_text.py     # Extract text + DA from MapTask XML
-│   ├── extract_vectors.py          # Extract pragmatic vectors from text
-│   ├── pca_interpolation.py         # Visualize pragmatic space (PCA) + interpolation
-│   ├── plugin_prediction_distribution.py  # Confusion matrix + interpolation
-│   ├── precompute_prag_vectors.py   # Precompute vectors for all utterances
-│   ├── speaker_distribution.py     # DA distribution by speaker
-│   ├── speaker_profiling.py         # Speaker profiling from SwDA zip
-│   └── topic_da_analysis.py         # MapTask topic-DA distribution
-├── requirements.txt
-└── README.md
-```
+## :scroll: Scripts Overview
 
-## 📋 Requirements
+| Script | Description |
+|--------|-------------|
+| `download_maptask.sh` | Download & process MapTask corpus |
+| `extract_vectors.py` | Extract pragmatic vectors from any JSONL data |
+| `build_episodes.py` | Build conversation episodes from test data |
+| `make_contexts_from_swda.py` | Build context file for vector precomputation |
+| `precompute_prag_vectors.py` | Precompute vectors from context file |
+| `analysis_da_distribution.py` | DA distribution & transition analysis |
+| `analysis_speaker_profiles.py` | Speaker profiles from MapTask episodes |
+| `analysis_speaker_profiles_from_swda.py` | Speaker profiles from SwDA zip |
+| `analysis_pragmatic_space.py` | Geometric structure of pragmatic space |
+| `analysis_plugin_evaluation.py` | Plugin accuracy on SwDA |
+| `analysis_cross_corpus.py` | Cross-corpus evaluation (SwDA → MapTask) |
+| `analysis_maptask_profiles.py` | MapTask speaker/topic analysis |
+| `supplementary_analysis.py` | Confusion matrix, interpolation, multi-label |
+| `da_tag_outputs.py` | Tag your own data with DA predictions |
+| `discover_new_prag_tags_ABC.py` | Discover new pragmatic tags via clustering |
 
-- Python 3.8+
-- PyTorch 1.10+
-- transformers
-- scikit-learn
-- pandas
-- numpy
-- matplotlib
-- seaborn
-- umap-learn (optional, for UMAP visualization)
+---
 
-## 🔬 What Can You Do With It?
-
-- 🔍 **Corpus-level distribution analysis** — Visualize how dialogue acts cluster in geometric space
-- 👤 **Speaker-level profiling** — Profile individual speakers by their position in the pragmatic space
-- 📈 **Sequential dynamics** — Analyze transitions between dialogue acts in conversation flow
-- 🌐 **Cross-corpus generalization** — Plugin trained on SwDA, evaluated on MapTask (cooperative categories: 70.7% accuracy)
-
-## 📄 License
-
-This project is licensed under the **MIT License**.
-
-## 📢 Citation
+## :book: Citation
 
 ```
 TODO: Add citation when paper is published
 ```
+
+---
+
+## :page_facing_up: License
+
+MIT License

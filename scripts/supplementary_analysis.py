@@ -1,12 +1,9 @@
+#!/usr/bin/env python3
 """
-Supplementary Experiments for LRE Paper
-E7d: Confusion Matrix
-E7e: Pragmatic Space Interpolation
-Human vs Plugin DA Comparison
-Multi-label Analysis
+Supplementary experiments: confusion matrix, pragmatic space interpolation,
+human vs plugin DA comparison, and multi-label analysis.
 """
 import os
-os.environ["HF_ENDPOINT"] = "https://hf-mirror.com"
 import json
 import torch
 import torch.nn as nn
@@ -22,10 +19,21 @@ from sklearn.preprocessing import label_binarize
 import warnings
 warnings.filterwarnings('ignore')
 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+ROOT_DIR = os.path.dirname(SCRIPT_DIR)
+PLUGIN_DIR = os.path.join(ROOT_DIR, "plugin")
+MODEL_FILE = os.path.join(PLUGIN_DIR, "model.safetensors")
+
+if not os.path.exists(MODEL_FILE):
+    raise FileNotFoundError(
+        f"Plugin model not found: {MODEL_FILE}\n"
+        "Run: python -c \"from huggingface_hub import snapshot_download; "
+        "snapshot_download('Anni0125/pragmatic-framework', local_dir='plugin')\""
+    )
+
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"Using device: {DEVICE}")
 
-PLUGIN_DIR = "../plugin"  # TODO: set to your plugin directory
 BASE = "distilbert-base-uncased"
 MAX_LEN = 64
 BATCH = 128
@@ -73,7 +81,7 @@ def predict_da_vectors(texts):
 print("\n=== E7d: Confusion Matrix ===")
 sw_texts = []
 sw_true_das = []
-with open("../data/test.jsonl") as f:  # TODO: set to your data directory
+with open("../data/test.jsonl") as f:
     for i, line in enumerate(f):
         if i >= N_SAMPLE_LARGE:
             break
@@ -117,8 +125,8 @@ ax2.set_xticklabels(das2, rotation=30, ha="right")
 ax2.set_ylabel("Count")
 ax2.set_title("E7d: Plugin Prediction Distribution (293-class Plugin)")
 plt.tight_layout()
-plt.savefig("E7d1_da_comparison.png", dpi=150)
-print("Saved: E7d1_da_comparison.png")
+plt.savefig("../figures/supplementary_E7d1_da_comparison.png", dpi=150)
+print("Saved: supplementary_E7d1_da_comparison.png")
 
 top_n = 10
 top_true_labels = [d for d, c in true_counter.most_common(top_n)]
@@ -149,8 +157,8 @@ for i in range(top_n):
                    color="white" if val > 0.5 else "black", fontsize=8)
 plt.colorbar(im, ax=ax, label="Proportion")
 plt.tight_layout()
-plt.savefig("E7d2_confusion_matrix.png", dpi=150)
-print("Saved: E7d2_confusion_matrix.png")
+plt.savefig("../figures/supplementary_E7d2_confusion_matrix.png", dpi=150)
+print("Saved: supplementary_E7d2_confusion_matrix.png")
 
 print("\nPer-true-DA accuracy (top-10):")
 for i, da in enumerate(top_true_labels):
@@ -200,8 +208,8 @@ if len(available_das) >= 2:
     ax.set_title(f"E7e: Pragmatic Space Interpolation\n({da1} -> {da2})")
     ax.legend()
     plt.tight_layout()
-    plt.savefig("E7e_interpolation.png", dpi=150)
-    print("Saved: E7e_interpolation.png")
+    plt.savefig("../figures/supplementary_E7e_interpolation.png", dpi=150)
+    print("Saved: supplementary_E7e_interpolation.png")
 
     print("\nCosine similarity along interpolation path:")
     for j, a in enumerate(alphas):
@@ -242,15 +250,15 @@ if len(common_das) > 0:
     ax.set_title("Human vs Plugin: DA Distribution Comparison\n(Top DAs with Matching Labels)")
     ax.legend()
     plt.tight_layout()
-    plt.savefig("E7d3_human_vs_plugin.png", dpi=150)
-    print("Saved: E7d3_human_vs_plugin.png")
+    plt.savefig("../figures/supplementary_E7d3_human_vs_plugin.png", dpi=150)
+    print("Saved: supplementary_E7d3_human_vs_plugin.png")
 else:
     print("No matching DAs between human annotations and plugin predictions - skipping comparison chart")
 
 print("\n=== Multi-label Analysis ===")
 multi_label_count = 0
 multi_label_examples = []
-with open("../data/test.jsonl") as f:  # TODO: set to your data directory
+with open("../data/test.jsonl") as f:
     for i, line in enumerate(f):
         if i >= N_SAMPLE_LARGE:
             break
@@ -264,14 +272,14 @@ print(f"Multi-label utterances: {multi_label_count} / {N_SAMPLE_LARGE}")
 print(f"Sample multi-label examples: {multi_label_examples[:3]}")
 
 sample_da_field = None
-with open("../data/test.jsonl") as f:  # TODO: set to your data directory
+with open("../data/test.jsonl") as f:
     d = json.loads(f.readline())
     sample_da_field = d.get("da", d.get("label", "unknown"))
     print(f"Sample DA field type: {type(sample_da_field)}, value: {sample_da_field}")
 
 da_cooccur = defaultdict(Counter)
 prev_da = None
-with open("../data/test.jsonl") as f:  # TODO: set to your data directory
+with open("../data/test.jsonl") as f:
     for i, line in enumerate(f):
         if i >= N_SAMPLE_LARGE:
             break

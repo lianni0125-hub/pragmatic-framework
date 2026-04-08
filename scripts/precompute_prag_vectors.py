@@ -1,14 +1,33 @@
+#!/usr/bin/env python3
+"""Precompute pragmatic vectors from a context file using the plugin model."""
 import torch
 import json
 from transformers import AutoTokenizer, AutoModel
 from safetensors.torch import load_file
 import os
 
-DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-PLUGIN_DIR = "../plugin"  # TODO: set to your plugin directory
-# CTX_PATH = "/path/to/your/contexts.txt"  # TODO: required but not provided in this repo
-OUT = "../vectors/prag_vectors.pt"
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+ROOT_DIR = os.path.dirname(SCRIPT_DIR)
+PLUGIN_DIR = os.path.join(ROOT_DIR, "plugin")
+MODEL_FILE = os.path.join(PLUGIN_DIR, "model.safetensors")
+CTX_PATH = os.path.join(ROOT_DIR, "data", "contexts.txt")
+OUT = os.path.join(ROOT_DIR, "vectors", "prag_vectors.pt")
 MAX_LEN = 64
+
+if not os.path.exists(MODEL_FILE):
+    raise FileNotFoundError(
+        f"Plugin model not found: {MODEL_FILE}\n"
+        "Run: python -c \"from huggingface_hub import snapshot_download; "
+        "snapshot_download('Anni0125/pragmatic-framework', local_dir='plugin')\""
+    )
+
+if not os.path.exists(CTX_PATH):
+    raise FileNotFoundError(
+        f"Contexts file not found: {CTX_PATH}\n"
+        "Run: python scripts/make_contexts_from_swda.py first."
+    )
+
+DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 # load contexts
 contexts=[]

@@ -1,10 +1,9 @@
+#!/usr/bin/env python3
 """
-E7d-MapTask: Plugin Predictions vs Gold Labels on MapTask Corpus
-Plugin was trained on 293-class MapTask labels; gold uses 13-class coarse labels.
-Solution: map both to functional coarse categories for comparison.
+Cross-corpus evaluation: SwDA-trained plugin on MapTask corpus.
+Maps both plugin predictions and gold labels to functional coarse categories for comparison.
 """
 import os
-os.environ["HF_ENDPOINT"] = "https://hf-mirror.com"
 import json
 import torch
 import torch.nn as nn
@@ -18,10 +17,28 @@ import matplotlib.pyplot as plt
 import warnings
 warnings.filterwarnings('ignore')
 
+MAPTASK_JSON = os.path.join(os.path.dirname(__file__), "..", "maptask", "maptask_text_da.json")
+if not os.path.exists(MAPTASK_JSON):
+    raise FileNotFoundError(
+        f"MapTask data not found: {MAPTASK_JSON}\n"
+        "Run: bash scripts/download_maptask.sh"
+    )
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+ROOT_DIR = os.path.dirname(SCRIPT_DIR)
+PLUGIN_DIR = os.path.join(ROOT_DIR, "plugin")
+MODEL_FILE = os.path.join(PLUGIN_DIR, "model.safetensors")
+
+if not os.path.exists(MODEL_FILE):
+    raise FileNotFoundError(
+        f"Plugin model not found: {MODEL_FILE}\n"
+        "Run: python -c \"from huggingface_hub import snapshot_download; "
+        "snapshot_download('Anni0125/pragmatic-framework', local_dir='plugin')\""
+    )
+
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"Using device: {DEVICE}")
 
-PLUGIN_DIR = "../plugin"  # TODO: set to your plugin directory
 BASE = "distilbert-base-uncased"
 MAX_LEN = 64
 BATCH = 256
@@ -65,7 +82,7 @@ def predict_da(texts):
     return preds
 
 # Load MapTask utterances
-with open("../maptask/maptask_text_da.json") as f:  # TODO: set to your maptask_text_da.json path
+with open(MAPTASK_JSON) as f:
     utterances = json.load(f)
 
 texts = [u["text"] for u in utterances]
@@ -174,7 +191,7 @@ ax2.set_xticklabels(das2, rotation=45, ha="right")
 ax2.set_ylabel("Count")
 ax2.set_title("E7d-MapTask: Plugin Functional Category Distribution")
 plt.tight_layout()
-plt.savefig("E7d_maptask1_distribution.png", dpi=150)
+plt.savefig("../figures/E7d_maptask1_distribution.png", dpi=150)
 print("Saved: E7d_maptask1_distribution.png")
 
 # ========================
@@ -209,7 +226,7 @@ for i in range(n):
                    color="white" if val > 0.5 else "black", fontsize=9)
 plt.colorbar(im, ax=ax, label="Proportion")
 plt.tight_layout()
-plt.savefig("E7d_maptask2_confusion.png", dpi=150)
+plt.savefig("../figures/E7d_maptask2_confusion.png", dpi=150)
 print("Saved: E7d_maptask2_confusion.png")
 
 # ========================
@@ -238,7 +255,7 @@ ax.legend()
 for i, (d, a) in enumerate(zip(cats, accs)):
     ax.text(i, a + 0.02, f"{a:.2f}", ha="center", fontsize=8)
 plt.tight_layout()
-plt.savefig("E7d_maptask3_per_cat_acc.png", dpi=150)
+plt.savefig("../figures/E7d_maptask3_per_cat_acc.png", dpi=150)
 print("Saved: E7d_maptask3_per_cat_acc.png")
 
 # ========================

@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+"""Analyze speaker and topic profiles from MapTask corpus."""
 import xml.etree.ElementTree as ET
 import os, re
 from collections import Counter, defaultdict
@@ -7,7 +9,16 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 
-BASE = "../maptask/maptaskv2-1/Data"  # TODO: download MapTask from https://groups.inf.ed.ac.uk/maptask/ and unzip here
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+ROOT_DIR = os.path.dirname(SCRIPT_DIR)
+MAPTASK_CORPUS_XML = os.path.join(ROOT_DIR, "maptask", "maptaskv2-1", "Data", "corpus-resources", "maptask-corpus.xml")
+if not os.path.exists(MAPTASK_CORPUS_XML):
+    raise FileNotFoundError(
+        f"MapTask data not found: {MAPTASK_CORPUS_XML}\n"
+        "Run: bash scripts/download_maptask.sh"
+    )
+
+BASE = os.path.join(ROOT_DIR, "maptask", "maptaskv2-1", "Data")
 NS = "http://nite.sourceforge.net/"
 
 # ========================
@@ -126,7 +137,7 @@ else:
         ax.set_ylabel("Topic (Map ID)")
         ax.set_title("E4: Cross-Topic DA Distribution (MapTask)")
         plt.tight_layout()
-        plt.savefig("E4_topic_da_distribution.png", dpi=150)
+        plt.savefig("../figures/E4_topic_da_distribution.png", dpi=150)
         print("Saved: E4_topic_da_distribution.png")
 
         # Topic detail charts
@@ -144,7 +155,7 @@ else:
             ax.set_xlim(0, 1)
         plt.suptitle("E4: Top-5 DAs per Topic (MapTask)", y=1.01)
         plt.tight_layout()
-        plt.savefig("E4_topic_da_detail.png", dpi=150)
+        plt.savefig("../figures/E4_topic_da_detail.png", dpi=150)
         print("Saved: E4_topic_da_detail.png")
 
     # ========================
@@ -180,7 +191,7 @@ else:
         ax.set_title("E6: DA Distribution by Individual Speaker (MapTask)")
         ax.legend(fontsize=6, ncol=min(4, len(top_speakers)), loc="upper right")
         plt.tight_layout()
-        plt.savefig("E6_speaker_profiling.png", dpi=150)
+        plt.savefig("../figures/E6_speaker_profiling.png", dpi=150)
         print("Saved: E6_speaker_profiling.png")
 
     # E6b: Gender comparison
@@ -208,7 +219,7 @@ else:
     ax.set_title("E6: DA Distribution by Speaker Gender (MapTask)")
     ax.legend()
     plt.tight_layout()
-    plt.savefig("E6_gender_comparison.png", dpi=150)
+    plt.savefig("../figures/E6_gender_comparison.png", dpi=150)
     print("Saved: E6_gender_comparison.png")
 
     # ========================
@@ -242,7 +253,7 @@ else:
     ax.legend(handles=[plt.Line2D([0],[0], marker='o', color='w', markerfacecolor='cornflowerblue', label='Male', markersize=8),
                        plt.Line2D([0],[0], marker='o', color='w', markerfacecolor='coral', label='Female', markersize=8)])
     plt.tight_layout()
-    plt.savefig("E5_speaker_umap.png", dpi=150)
+    plt.savefig("../figures/E5_speaker_umap.png", dpi=150)
     print("Saved: E5_speaker_umap.png")
 
     print("\nAll MapTask analysis complete!")
