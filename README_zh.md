@@ -1,12 +1,12 @@
 # Pragmatic Framework
 
-> :brain: 对话行为监督让语言在**几何空间**中呈现清晰结构
+> :brain: 通过对话行为监测，将对话语言在**几何空间**中呈现清晰结构
 
 ![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
 ![Framework](https://img.shields.io/badge/Framework-DistilBERT-red.svg)
 
-将原始对话文本转化为 **768 维语用向量**，对话行为在空间中呈现出清晰的结构。框架提供预训练的 DistilBERT DA 标注器（293 类 DAMSL）以及完整的分析工具链。
+将原始对话文本转化为 **768 维语用向量**，使对话行为映射为**语用空间**。框架提供预训练的 DistilBERT DA 标注器（293 类 DAMSL）以及完整的分析工具链。
 
 ### :star: 核心亮点
 
