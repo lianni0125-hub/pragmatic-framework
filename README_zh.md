@@ -96,7 +96,7 @@ python scripts/extract_vectors.py --input your_data.jsonl --output your_vectors.
 | **293** | Plugin 可以预测的 SwDA DAMSL 细粒度标签数量 | Plugin 分类头（768 → 293） |
 | **8** | 为方便分析将 293 类映射为 8 个粗粒度类别 | 下游分析脚本使用 |
 
-> **为什么是 768？** Plugin 基于 DistilBERT 构建，其编码器输出 768 维隐藏状态。这些向量编码的是交流功能——两个词相同但对话行为不同的句子（例如 "You should go." vs "Should you go?"）会有**不同**的 768 维语用向量，尽管它们的语义内容相似。
+> **为什么是 768？** Plugin 基于 DistilBERT 构建，其编码器输出 768 维隐藏状态。这些向量编码的是交流功能——两个词相同但对话行为不同的句子（例如 "That's interesting." vs "That's interesting?"）会有**不同**的 768 维语用向量，尽管它们的语义内容相似。
 
 ---
 
