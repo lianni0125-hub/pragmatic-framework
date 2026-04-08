@@ -15,10 +15,10 @@
 | :brain: **DA Plugin** | 预训练 DistilBERT 标注器 — 可对任意英语对话预测 293 类 DAMSL 对话行为 |
 | :chart_with_upwards_trend: **语用向量** | 768 维向量，捕捉交流功能而非仅语义内容 |
 | :microscope: **几何分析** | PCA 中心点、余弦相似度、对话行为间的插值路径 |
-| :busts_in_silhouette: **说话人画像** | 基于角色的画像（Guide vs Follower），含真实姓名 |
-| :arrows_counterclockwise: **跨语料泛化** | 在 SwDA 上训练 → 在 MapTask 上评测（8 个功能类别） |
+| :busts_in_silhouette: **说话人画像** | 基于角色的画像（Guide vs Follower） |
+| :arrows_counterclockwise: **跨语料泛化** | 在 SwDA 上训练 → 在 MapTask 上评测 |
 
-> **"You should go." vs "Should you go?"** — 词相同、对话行为不同 → 在学习到的空间中**向量不同**。
+> **"That's interesting."（陈述）vs "That's interesting?"（质疑回应）** — 词相同，但**交流功能不同** → pragmatic 向量不同。
 
 ---
 

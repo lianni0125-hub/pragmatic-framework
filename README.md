@@ -15,10 +15,10 @@ Turn raw utterances into **768-dimensional pragmatic vectors** where dialogue ac
 | :brain: **DA Plugin** | Pre-trained DistilBERT tagger — predict 293 DAMSL dialogue acts on any English dialogue |
 | :chart_with_upwards_trend: **Pragmatic Vectors** | 768-dim vectors capturing communicative function, not just semantics |
 | :microscope: **Geometric Analysis** | PCA centroids, cosine similarity, interpolation paths between dialogue acts |
-| :busts_in_silhouette: **Speaker Profiling** | Role-based profiling (Guide vs Follower) with real named speakers |
-| :arrows_counterclockwise: **Cross-Corpus Generalization** | Trained on SwDA → evaluated on MapTask (8 functional categories) |
+| :busts_in_silhouette: **Speaker Profiling** | Role-based profiling (Guide vs Follower) |
+| :arrows_counterclockwise: **Cross-Corpus Generalization** | Trained on SwDA → evaluated on MapTask |
 
-> **"You should go." vs "Should you go?"** — Same words, different dialogue acts → **different pragmatic vectors** in the learned space.
+> **"That's interesting." (statement) vs "That's interesting?" (skeptical response)** — same words, **different pragmatic vectors** because they serve different communicative functions.
 
 ---
 
