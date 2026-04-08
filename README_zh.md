@@ -6,7 +6,7 @@
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
 ![Framework](https://img.shields.io/badge/Framework-DistilBERT-red.svg)
 
-将原始对话文本转化为 **768 维语用向量**，使对话行为映射为**语用空间**。框架提供预训练的 DistilBERT DA 标注器（293 类 DAMSL）以及完整的分析工具链。
+将原始对话文本转化为 **768 维语用向量**，使对话行为映射为语用空间。框架提供预训练的 DistilBERT DA 标注器（293 类 DAMSL）以及完整的分析工具链。
 
 ### :star: 核心亮点
 
