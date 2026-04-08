@@ -1,6 +1,6 @@
 # Pragmatic Framework
 
-> :brain: Map conversational language into a **geometric space** through dialogue-act supervision
+> :brain: Represent conversational language as points in a **geometric space**
 
 ![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
